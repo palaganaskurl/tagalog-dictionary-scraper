@@ -49,7 +49,7 @@ class TagalogDictionaryScraper:
         'rel.',
         'pseudo-verb',
         'existential',
-        # added parts of speech that +was not included but from my debugging, it was a part of speech
+        # added parts of speech that was not included but from my debugging, it was a part of speech
         'imp.',
         'expr.',
         'excl.',
@@ -88,6 +88,7 @@ class TagalogDictionaryScraper:
     def scrape(self, async_scrape=False, max_urls=10, sort=False) -> Dict:
         """
         Start scraping here.
+        TODO: Sort
 
         :type async_scrape: False
         :param async_scrape: True if scrape asynchronously, False otherwise
