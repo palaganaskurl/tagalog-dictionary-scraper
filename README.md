@@ -23,7 +23,7 @@ Some parts of speech are located on weird locations in the definition.
 
 Some punctuation marks are not removed in the definition.
 
-Some parts of speech are added to certain words even if that word doesn't contain the part of speech because ```.find() ```. I can't think of any intelligent way to guess the part of speech.
+Some parts of speech are added to certain words even if that word doesn't contain the part of speech because of ```.find() ```. I can't think of any intelligent way to guess the part of speech.
 
 And many more...
 
