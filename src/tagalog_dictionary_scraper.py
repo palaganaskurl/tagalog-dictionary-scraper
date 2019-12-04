@@ -61,6 +61,15 @@ class TagalogDictionaryScraper:
         'n.,zoo.',
         'adj./adv.'
     ]
+    error_pos_mapping = {
+        'adj': 'adj.',
+        '[n]': 'n.',
+        'n': 'n.',
+        'vinf': ['v.', 'inf.'],
+        'v.,inf.': ['v.', 'inf.'],
+        'n.,zoo.': ['n.', 'zoo.'],
+        'adj./adv.': ['adj,', 'adv.']
+    }
 
     # noinspection PyMethodMayBeStatic
     def print_words(self, words: Dict) -> None:
@@ -90,16 +99,15 @@ class TagalogDictionaryScraper:
 
         return response.html
 
-    def scrape(self, async_scrape=False, max_urls=10, sort=False) -> Dict:
+    def scrape(self, async_scrape: bool = False, max_urls: int = 10) -> Dict:
         """
         Start scraping here.
-        TODO: Sort
 
         :type async_scrape: False
         :param async_scrape: True if scrape asynchronously, False otherwise
         :type max_urls: int
         :param max_urls: Max URL per getting of page contents to minimize process.
-                         Used only when async is True
+                         Used only when async_scrape is True
         :rtype: Dict
         :return: Dictionary in the form of {'word': {'part_of_speech': [], definition: ''}
         """
@@ -238,12 +246,14 @@ class TagalogDictionaryScraper:
         :return: List of Part of Speech Tags
         """
         indices_pos_mapping = {}
+        tokens = parts_of_speech.text.split()
 
         for part_of_speech in self.parts_of_speech:
-            index = parts_of_speech.text.find(part_of_speech)
-
-            if index != -1:
-                indices_pos_mapping[index] = part_of_speech
+            for index, token in enumerate(tokens):
+                # Check if the current token contains part of speech like text
+                # Also check if the current token doesn't exceed the part of speech length
+                if token.startswith(part_of_speech) and len(token) < len(part_of_speech) + 2:
+                    indices_pos_mapping[index] = part_of_speech
 
         # max_index means that this part of speech is the nearest to the definition
         max_index = max(indices_pos_mapping.keys())
@@ -253,6 +263,31 @@ class TagalogDictionaryScraper:
         parts_of_speech.append(last_part_of_speech)
 
         return parts_of_speech
+
+    def _clean_parts_of_speech(self, parts_of_speech: List[str]) -> List[str]:
+        """
+        Cleans parts of speech that has errors.
+
+        :type parts_of_speech: List[str]
+        :param parts_of_speech: List of parts of speech
+        :rtype: List[str]
+        :return: Cleaned/Fixed parts of speech
+        """
+        cleaned_parts_of_speech = []
+
+        for part_of_speech in parts_of_speech:
+            if part_of_speech not in self.error_pos_mapping:
+                cleaned_parts_of_speech.append(part_of_speech)
+                continue
+
+            part_of_speech = self.error_pos_mapping[part_of_speech]
+
+            if isinstance(part_of_speech, str):
+                cleaned_parts_of_speech.append(part_of_speech)
+            elif isinstance(part_of_speech, list):
+                cleaned_parts_of_speech.extend(part_of_speech)
+
+        return cleaned_parts_of_speech
 
     # noinspection PyMethodMayBeStatic
     def _get_definition(self, definition: Element, part_of_speech: str) -> str:
@@ -287,14 +322,16 @@ class TagalogDictionaryScraper:
 
             for group in word_group:
                 word = group.find('a', first=True).text
-                definition = group.find('div.definition p', first=True)
-                parts_of_speech = self._get_parts_of_speech(definition)
-                definition = self._get_definition(definition, parts_of_speech[-1])
+                definition_html = group.find('div.definition p', first=True)
+                parts_of_speech = self._get_parts_of_speech(definition_html)
+                definition = self._get_definition(definition_html, parts_of_speech[-1])
+                parts_of_speech = self._clean_parts_of_speech(parts_of_speech)
                 words[word] = {
                     'parts_of_speech': parts_of_speech,
                     'definition': definition
                 }
-                logging.info('Word: {} Part of Speech: {} Definition: {}'.format(
+                logging.info('Original Text: {} Word: {} Part of Speech: {} Definition: {}'.format(
+                    definition_html.text,
                     word,
                     parts_of_speech,
                     definition
