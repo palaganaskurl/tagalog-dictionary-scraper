@@ -49,7 +49,7 @@ class TagalogDictionaryScraper:
         'rel.',
         'pseudo-verb',
         'existential',
-        # added parts of speech that was not included but from my debugging, it was a part of speech
+        # added parts of speech that was not included or parts of speech that they carelessly put
         'imp.',
         'expr.',
         'excl.',
