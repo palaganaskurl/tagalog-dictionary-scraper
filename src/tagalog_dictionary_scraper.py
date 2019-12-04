@@ -54,7 +54,12 @@ class TagalogDictionaryScraper:
         'expr.',
         'excl.',
         'adj',
-        '[n]'
+        '[n]',
+        'vinf.',
+        'n',
+        'v.,inf.',
+        'n.,zoo.',
+        'adj./adv.'
     ]
 
     # noinspection PyMethodMayBeStatic
