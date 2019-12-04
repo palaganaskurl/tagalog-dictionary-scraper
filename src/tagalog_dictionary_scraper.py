@@ -16,7 +16,7 @@ class TagalogDictionaryScraper:
 
     url = 'https://tagalog.pinoydictionary.com'
     letters = list(ascii_lowercase)
-    # Part of speeches extracted from https://www.pinoydictionary.com/js/dictionary.js
+    # Parts of speech extracted from https://www.pinoydictionary.com/js/dictionary.js
     parts_of_speech = [
         'n.',
         'syn.',
